@@ -423,17 +423,26 @@ class BaseRoBot(object):
         else:
             return reply.render()
 
-    def check_signature(self, timestamp, nonce, signature):
+    def check_signature(self, timestamp, nonce, signature, echo_str="", body=""):
         """
         根据时间戳和生成签名的字符串 (nonce) 检查签名。
 
+        :param body:
+        :param echo_str:
         :param timestamp: 时间戳
         :param nonce: 生成签名的随机字符串
         :param signature: 要检查的签名
         :return: 如果签名合法将返回 ``True``，不合法将返回 ``False``
         """
+        msg_encrypt = ""
+        if echo_str != "":
+            msg_encrypt = echo_str
+        else:
+            message_dict = parse_xml(body)
+            if "Encrypt" in message_dict:
+                msg_encrypt = message_dict['Encrypt']
         return check_signature(
-            self.config["TOKEN"], timestamp, nonce, signature
+            self.config["TOKEN"], timestamp, nonce, signature, msg_encrypt
         )
 
     def error_page(self, f):

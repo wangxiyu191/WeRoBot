@@ -30,10 +30,10 @@ def get_signature(token, timestamp, nonce, *args):
     return sha1(sign).hexdigest()
 
 
-def check_signature(token, timestamp, nonce, signature):
+def check_signature(token, timestamp, nonce, signature, *args):
     if not (token and timestamp and nonce and signature):
         return False
-    sign = get_signature(token, timestamp, nonce)
+    sign = get_signature(token, timestamp, nonce, *args)
     return sign == signature
 
 

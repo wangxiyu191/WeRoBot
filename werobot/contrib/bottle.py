@@ -40,19 +40,37 @@ def make_view(robot):
     """
 
     def werobot_view(*args, **kwargs):
-        if not robot.check_signature(
-            request.query.timestamp,
-            request.query.nonce,
-            request.query.signature
-        ):
-            return HTTPResponse(
-                status=403,
-                body=robot.make_error_page(html.escape(request.url))
-            )
         if request.method == 'GET':
-            return request.query.echostr
+            if not robot.check_signature(
+                request.query.timestamp,
+                request.query.nonce,
+                request.query.msg_signature,
+                echo_str=request.query.echostr
+            ):
+                return HTTPResponse(
+                    status=403,
+                    body=robot.make_error_page(html.escape(request.url))
+                )
+            message = robot.crypto.decrypt_message(
+                timestamp=request.query.timestamp,
+                nonce=request.query.nonce,
+                msg_signature=request.query.msg_signature,
+                encrypt_msg=request.query.echostr
+            )
+            print message
+            return message
         else:
             body = request.body.read()
+            if not robot.check_signature(
+                request.query.timestamp,
+                request.query.nonce,
+                request.query.msg_signature,
+                body=body
+            ):
+                return HTTPResponse(
+                    status=403,
+                    body=robot.make_error_page(html.escape(request.url))
+                )
             message = robot.parse_message(
                 body,
                 timestamp=request.query.timestamp,
