@@ -57,7 +57,6 @@ def make_view(robot):
                 msg_signature=request.query.msg_signature,
                 encrypt_msg=request.query.echostr
             )
-            print message
             return message
         else:
             body = request.body.read()
